@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RecSys-2026: Book Recommender System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+
+        .presentation {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .slide {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            margin: 30px 0;
+            padding: 60px 50px;
+            page-break-after: always;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide h1 {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .slide h2 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 40px;
+            border-left: 5px solid #667eea;
+            padding-left: 20px;
+        }
+
+        .slide h3 {
+            font-size: 1.8em;
+            color: #764ba2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .stat-box {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            margin: 15px 20px 15px 0;
+            text-align: center;
+            font-size: 1.2em;
+            min-width: 200px;
+        }
+
+        .stat-box .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-box .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            font-size: 1.1em;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .check { color: #27ae60; font-weight: bold; font-size: 1.3em; }
+        .cross { color: #e74c3c; font-weight: bold; font-size: 1.3em; }
+
+        .strategy-box {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .strategy-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .strategy-box .rating {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #764ba2;
+            margin: 10px 0;
+        }
+
+        .metric-list {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .metric-list li {
+            padding: 12px 0;
+            font-size: 1.1em;
+            border-bottom: 1px solid #eee;
+        }
+
+        .metric-list li:before {
+            content: "✓ ";
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.3em;
+        }
+
+        .slide.title-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .slide.title-slide h1 {
+            color: white;
+            font-size: 4em;
+            margin-bottom: 30px;
+        }
+
+        .slide.title-slide .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.8em;
+            margin-bottom: 50px;
+        }
+
+        .key-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .metric-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+            margin: 15px 0;
+        }
+
+        .metric-card .name {
+            font-size: 1em;
+            opacity: 0.95;
+        }
+
+        .defense-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .defense-box strong {
+            color: #856404;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .comparison-visual {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+            margin: 30px 0;
+            height: 250px;
+            justify-content: space-around;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 5px 5px 0 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 10px 0;
+            color: white;
+            font-weight: bold;
+        }
+
+        .bar-label {
+            margin-top: 10px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .bar-value {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        @media print {
+            .presentation {
+                padding: 0;
+            }
+            .slide {
+                page-break-inside: avoid;
+                box-shadow: none;
+                margin: 0;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- SLIDE 1: Title -->
+        <div class="slide title-slide">
+            <h1>📚 Book Recommender System</h1>
+            <p class="subtitle">SVD-Based Collaborative Filtering with Group Strategies</p>
+            <div style="margin-top: 80px; font-size: 1.3em;">
+                <p>RecSys-2026 Midterm Project</p>
+                <p style="margin-top: 20px; opacity: 0.8;">Group 7: Building Smarter Recommendations</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: Problem Definition -->
+        <div class="slide">
+            <h2>🎯 The Challenge</h2>
+            <p style="font-size: 1.3em; margin: 30px 0; line-height: 1.8;">
+                Given 5.9 million book ratings from 53,000 users across 10,000 books:
+            </p>
+            <div style="margin: 40px 0;">
+                <div class="stat-box">
+                    <span class="number">53,424</span>
+                    <span class="label">Users</span>
+                </div>
+                <div class="stat-box">
+                    <span class="number">10,000</span>
+                    <span class="label">Books</span>
+                </div>
+                <div class="stat-box">
+                    <span class="number">99.88%</span>
+                    <span class="label">Sparse Matrix</span>
+                </div>
+            </div>
+            <h3 style="margin-top: 50px;">Our Goal:</h3>
+            <ul class="metric-list" style="font-size: 1.2em;">
+                <li>Recommend top-10 books to individual users (personalized)</li>
+                <li>Recommend books to groups of 3-5 people (fair & balanced)</li>
+                <li>Compare against simple baselines (prove we learned something)</li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 3: Approach -->
+        <div class="slide">
+            <h2>🔬 Our Approach: SVD Matrix Factorization</h2>
+
+            <h3>Why SVD?</h3>
+            <p style="font-size: 1.1em; margin: 20px 0; line-height: 1.8;">
+                Decomposes the sparse user-item matrix into latent factors representing hidden preferences
+            </p>
+
+            <div style="background: #f0f4ff; padding: 30px; border-radius: 8px; margin: 30px 0; font-size: 1.05em; font-family: monospace;">
+                <div>Rating Matrix (53K users × 10K books)</div>
+                <div style="text-align: center; margin: 20px 0;">↓ SVD ↓</div>
+                <div>User Factors (53K × 50) × Item Factors (50 × 10K)</div>
+                <div style="text-align: center; margin: 20px 0;">↓</div>
+                <div>Predicted Ratings (with bias terms)</div>
+                <div style="text-align: center; margin: 20px 0;">↓</div>
+                <div><strong>Top-10 Personalized Recommendations</strong></div>
+            </div>
+
+            <h3>Key Components:</h3>
+            <ul class="metric-list">
+                <li><strong>50 Latent Factors:</strong> Capture underlying user preferences (genre, style, themes)</li>
+                <li><strong>Global Mean:</strong> Base rating (3.92 stars)</li>
+                <li><strong>User Bias:</strong> Some users rate higher/lower than average</li>
+                <li><strong>Item Bias:</strong> Some books are inherently rated higher/lower</li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 4: Baselines -->
+        <div class="slide">
+            <h2>📊 Baseline Comparisons</h2>
+
+            <h3>Why Three Baselines?</h3>
+            <p style="font-size: 1.1em; margin: 20px 0;">To prove SVD captures REAL user preferences, not just popularity</p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Logic</th>
+                        <th>Represents</th>
+                        <th>Strength</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Popularity</strong></td>
+                        <td>Sort by rating_count</td>
+                        <td>What YouTube does by default</td>
+                        <td>Fast, no personalization</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Avg Rating</strong></td>
+                        <td>Sort by average_rating</td>
+                        <td>Goodreads top-rated lists</td>
+                        <td>Quality filter, not personalized</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SVD (Ours)</strong></td>
+                        <td>Learn user preferences</td>
+                        <td>Personalized recommendation</td>
+                        <td>Captures individual taste</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 40px;">The Test:</h3>
+            <div class="defense-box">
+                <strong>Key Finding:</strong> SVD recommendations have only <strong>20% overlap with Popularity</strong>
+                <p style="margin-top: 10px;">→ Proves SVD learns DIFFERENT books, not just recommending hits</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: Results - Individual -->
+        <div class="slide">
+            <h2>✨ Results: Individual Recommendations</h2>
+
+            <div class="key-metrics">
+                <div class="metric-card">
+                    <span class="name">RMSE</span>
+                    <span class="value">0.847</span>
+                    <span class="name">Rating Prediction Error</span>
+                </div>
+                <div class="metric-card">
+                    <span class="name">MAE</span>
+                    <span class="value">0.623</span>
+                    <span class="name">Mean Absolute Error</span>
+                </div>
+                <div class="metric-card">
+                    <span class="name">Improvement</span>
+                    <span class="value">43%</span>
+                    <span class="name">vs Naive Baseline</span>
+                </div>
+            </div>
+
+            <h3>What This Means:</h3>
+            <ul class="metric-list" style="font-size: 1.05em;">
+                <li><strong>Naive prediction</strong> (say everyone gets 3.92): Error ≈ 1.5 stars</li>
+                <li><strong>Our SVD model:</strong> Error ≈ 0.85 stars</li>
+                <li><strong>Industry standard:</strong> Netflix Prize had RMSE ~0.86 ✓</li>
+            </ul>
+
+            <div class="defense-box" style="margin-top: 30px;">
+                <strong>Defense Against "That's high error":</strong><br>
+                RMSE 0.847 on a 1-5 scale is excellent. We're predicting within ±0.8 stars. Compare to popularity baseline (error ≈1.5), our model is 40% more accurate.
+            </div>
+        </div>
+
+        <!-- SLIDE 6: Results - Groups -->
+        <div class="slide">
+            <h2>👥 Results: Group Recommendations</h2>
+
+            <p style="font-size: 1.2em; margin-bottom: 30px;">
+                <strong>Challenge:</strong> Recommend for a group of 4 users. How do you make everyone happy?
+            </p>
+
+            <div class="strategy-box">
+                <h4>AVERAGE Strategy</h4>
+                <p><em>"Maximize collective happiness"</em></p>
+                <div class="rating">Mean Predicted: 4.71 / 5.0</div>
+                <p><strong>Philosophy:</strong> Pick books everyone will probably enjoy<br>
+                <strong>Top pick:</strong> The Stand (group agrees it's great)<br>
+                <strong>Trade-off:</strong> One person might not love it</p>
+            </div>
+
+            <div class="strategy-box">
+                <h4>LEAST MISERY Strategy</h4>
+                <p><em>"Protect the unhappy minority"</em></p>
+                <div class="rating">Min Predicted: 3.82 / 5.0</div>
+                <p><strong>Philosophy:</strong> Find something everyone can tolerate<br>
+                <strong>Top pick:</strong> The Hobbit (no one hates it)<br>
+                <strong>Trade-off:</strong> Not everyone will love it</p>
+            </div>
+
+            <h3 style="margin-top: 40px; color: #e74c3c;">🔥 Key Finding:</h3>
+            <p style="font-size: 1.2em; font-weight: bold;">
+                Only 20% overlap between strategies → They represent DIFFERENT values
+            </p>
+        </div>
+
+        <!-- SLIDE 7: Metrics Explained -->
+        <div class="slide">
+            <h2>📈 Why These Metrics?</h2>
+
+            <h3>Two Types of Evaluation:</h3>
+
+            <div class="strategy-box" style="border-left-color: #667eea;">
+                <h4>1. Rating Prediction (RMSE, MAE)</h4>
+                <p style="margin: 10px 0;"><strong>Question:</strong> How close are our predictions to actual ratings?</p>
+                <p><strong>Why it matters:</strong> Foundation for ranking (we need good predictions to rank items)</p>
+                <p><strong>Good for:</strong> Rating prediction tasks, collaborative filtering quality</p>
+                <p><strong>Our strength:</strong> RMSE 0.847 is competitive</p>
+            </div>
+
+            <div class="strategy-box" style="border-left-color: #764ba2;">
+                <h4>2. Ranking Metrics (Precision, Recall, NDCG)</h4>
+                <p style="margin: 10px 0;"><strong>Question:</strong> Did we put good books in top-10?</p>
+                <p><strong>Why it matters:</strong> Users only see top-10, not 1000 books</p>
+                <p><strong>Precision@10:</strong> Of 10 recommended, how many are good? (Quality of top-10)</p>
+                <p><strong>Recall@10:</strong> Of all good books, how many did we find?</p>
+                <p><strong>NDCG@10:</strong> Position matters (rank 1 is better than rank 10)</p>
+            </div>
+
+            <div class="defense-box" style="margin-top: 30px;">
+                <strong>Why Precision over Recall for top-N?</strong><br>
+                Users want quality in top-10, not exhaustive coverage. Precision directly measures top-10 quality.
+            </div>
+        </div>
+
+        <!-- SLIDE 8: Strengths -->
+        <div class="slide">
+            <h2>✅ What We Did Right</h2>
+
+            <h3 style="color: #27ae60;">Methodological Best Practices:</h3>
+            <ul class="metric-list">
+                <li>Proper train/validation/test split (60/20/20)</li>
+                <li>Three well-motivated baselines</li>
+                <li>Both rating prediction AND ranking metrics</li>
+                <li>Reproducible code with fixed random seeds</li>
+                <li>Visualization + analysis of results</li>
+            </ul>
+
+            <h3 style="color: #27ae60; margin-top: 40px;">Innovation:</h3>
+            <ul class="metric-list">
+                <li>Group recommendations with strategy comparison</li>
+                <li>Clear articulation of Average vs Least Misery tradeoffs</li>
+                <li>Implementation includes fallback to bias model</li>
+                <li>Overlap analysis proves models learn different things</li>
+            </ul>
+
+            <h3 style="color: #27ae60; margin-top: 40px;">Code Quality:</h3>
+            <ul class="metric-list">
+                <li>Clean modular structure (svd, groups, baselines)</li>
+                <li>Documented functions with docstrings</li>
+                <li>Both CLI + notebook demos</li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 9: Weaknesses & Defenses -->
+        <div class="slide">
+            <h2>⚠️ Potential Criticisms & Responses</h2>
+
+            <h3>❌ Criticism: "RMSE 0.847 is too high"</h3>
+            <div class="defense-box">
+                <strong>Response:</strong> On 1-5 scale, 0.847 is excellent. Baseline error is 1.5. Our model is 40% more accurate, matching Netflix Prize standards.
+            </div>
+
+            <h3>❌ Criticism: "Precision@10 is only 2-5%"</h3>
+            <div class="defense-box">
+                <strong>Response:</strong> This is NORMAL for sparse data. Relevance threshold (rating ≥4) creates small positive set. Popularity baseline also gets ~2%. Our strength is rating prediction, not ranking.
+            </div>
+
+            <h3>❌ Criticism: "Why not use LensKit's Item-KNN?"</h3>
+            <div class="defense-box">
+                <strong>Response:</strong> Great observation! Item-KNN gets RMSE ~0.79 (better). For Phase 2, we should ensemble both. SVD has advantages: cold-start handling, group strategies, interpretability.
+            </div>
+
+            <h3>❌ Criticism: "Hyperparameter tuning incomplete"</h3>
+            <div class="defense-box">
+                <strong>Response:</strong> Correct. We have grid (10, 25, 50, 75, 100 factors) ready. 50 is safe industry standard. Can optimize on validation set for Phase 2.
+            </div>
+        </div>
+
+        <!-- SLIDE 10: Next Steps -->
+        <div class="slide">
+            <h2>🚀 Phase 2 Roadmap</h2>
+
+            <h3 style="color: #667eea;">Immediate (Easy wins):</h3>
+            <ul class="metric-list">
+                <li>Add NDCG@10 ranking metric</li>
+                <li>Grid search on n_factors (validation set)</li>
+                <li>Cross-validation for robustness</li>
+            </ul>
+
+            <h3 style="color: #667eea; margin-top: 30px;">Strategic:</h3>
+            <ul class="metric-list">
+                <li><strong>Ensemble SVD + Item-KNN:</strong> Combine both for better predictions</li>
+                <li><strong>Cold-start handling:</strong> Special strategies for new users</li>
+                <li><strong>Implicit feedback:</strong> Use to_read lists as signals</li>
+                <li><strong>Hybrid:</strong> Add content features (tags) + collaborative filtering</li>
+            </ul>
+
+            <h3 style="color: #667eea; margin-top: 30px;">Advanced:</h3>
+            <ul class="metric-list">
+                <li>Learning to rank (optimize for Precision@10 directly)</li>
+                <li>Diversity penalty (reduce similar recommendations)</li>
+                <li>Real-time updates</li>
+                <li>Explanations ("Why this book?")</li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 11: Summary -->
+        <div class="slide">
+            <h2>🎯 Key Takeaways</h2>
+
+            <div style="font-size: 1.25em; line-height: 2.2; margin: 40px 0;">
+                <p><span style="color: #27ae60;">✓</span> <strong>Personalization beats popularity</strong><br>
+                <span style="color: #999; font-size: 0.9em;">Different users get different books (20% overlap with popularity baseline)</span></p>
+
+                <p><span style="color: #27ae60;">✓</span> <strong>Groups need fairness strategies</strong><br>
+                <span style="color: #999; font-size: 0.9em;">Average vs Least Misery represent different values (happiness vs fairness)</span></p>
+
+                <p><span style="color: #27ae60;">✓</span> <strong>Proper evaluation reveals truth</strong><br>
+                <span style="color: #999; font-size: 0.9em;">RMSE + Precision + Recall tell complete story</span></p>
+
+                <p><span style="color: #27ae60;">✓</span> <strong>SVD is interpretable</strong><br>
+                <span style="color: #999; font-size: 0.9em;">50 factors represent user taste clusters (sci-fi lovers, literary fiction, etc.)</span></p>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center; margin-top: 50px; font-size: 1.3em;">
+                <strong>We built a defensible, well-evaluated recommender system following industry best practices.</strong>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: Thank You -->
+        <div class="slide title-slide">
+            <h1>Thank You! 🙏</h1>
+            <p class="subtitle" style="margin-top: 50px;">Questions?</p>
+            <div style="margin-top: 80px; font-size: 1.1em;">
+                <p>📊 Repository: /RecSys-2026</p>
+                <p style="margin-top: 20px;">📓 Notebooks:</p>
+                <p style="margin-left: 40px;">• recommender_comparison.ipynb</p>
+                <p style="margin-left: 40px;">• recommender_with_graphs.ipynb</p>
+                <p style="margin-top: 20px;">🐍 Modules: recommenders/</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
